@@ -33,7 +33,7 @@ headers = {
 
 # Get information regarding collection
 
-collection = requests.get(f"http://api.opensea.io/api/v1/collection/{gooniezgangofficial}?format=json")
+collection = requests.get(f"http://api.opensea.io/api/v1/collection/{CollectionName}?format=json")
 
 if collection.status_code == 429:
     print("Server returned HTTP 429. Request was throttled. Please try again in about 5 minutes.")
@@ -50,11 +50,11 @@ collectioninfo = json.loads(collection.content.decode())
 if not os.path.exists('./images'):
     os.mkdir('./images')
 
-if not os.path.exists(f'./images/{gooniezgangofficial}'):
+if not os.path.exists(f'./images/{CollectionName}'):
     os.mkdir(f'./images/{CollectionName}')
 
-if not os.path.exists(f'./images/{gooniezgangofficial}/image_data'):
-    os.mkdir(f'./images/{gooniezgangofficial}/image_data')
+if not os.path.exists(f'./images/{CollectionName}/image_data'):
+    os.mkdir(f'./images/{CollectionName}/image_data')
 
 # Get total NFT count
 
@@ -64,7 +64,7 @@ count = int(collectioninfo["collection"]["stats"]["count"])
 
 iter = math.ceil(count / 30)
 
-print(f"\nBeginning download of \"{gooniezgangofficial}\" collection.\n")
+print(f"\nBeginning download of \"{CollectionName}\" collection.\n")
 
 # Define variables for statistics
 
@@ -113,7 +113,7 @@ for i in range(iter):
     for i in range(offset, offset+30):
       token_ids += f"&token_ids={i}"
       
-    data = json.loads(scraper.get(f"https://api.opensea.io/api/v1/assets?order_direction=asc{token_ids}&limit=50&collection={gooniezgangofficial}&format=json", headers=headers).text)
+    data = json.loads(scraper.get(f"https://api.opensea.io/api/v1/assets?order_direction=asc{token_ids}&limit=50&collection={CollectionName}&format=json", headers=headers).text)
 
     if "assets" in data:
         for asset in data["assets"]:
@@ -123,19 +123,19 @@ for i in range(iter):
           print(f"\n#{formatted_number}:")
 
           # Check if data for the NFT already exists, if it does, skip saving it
-          if os.path.exists(f'./images/{gooniezgangofficial}/image_data/{formatted_number}.json'):
+          if os.path.exists(f'./images/{CollectionName}/image_data/{formatted_number}.json'):
               print(f"  Data  -> [\u2713] (Already Downloaded)")
               stats["AlreadyDownloadedData"] += 1
           else:
                 # Take the JSON from the URL, and dump it to the respective file.
-                dfile = open(f"./images/{gooniezgangofficial}/image_data/{formatted_number}.json", "w+")
+                dfile = open(f"./images/{CollectionName}/image_data/{formatted_number}.json", "w+")
                 json.dump(asset, dfile, indent=3)
                 dfile.close()
                 print(f"  Data  -> [\u2713] (Successfully downloaded)")
                 stats["DownloadedData"] += 1
 
           # Check if image already exists, if it does, skip saving it
-          if os.path.exists(f'./images/{gooniezgangofficial}/{formatted_number}.png'):
+          if os.path.exists(f'./images/{CollectionName}/{formatted_number}.png'):
               print(f"  Image -> [\u2713] (Already Downloaded)")
               stats["AlreadyDownloadedImages"] += 1
           else:
@@ -153,7 +153,7 @@ for i in range(iter):
 
             # If the URL returns status code "200 Successful", save the image into the "images" folder.
             if image.status_code == 200:
-                file = open(f"./images/{gooniezgangofficial}/{formatted_number}.png", "wb+")
+                file = open(f"./images/{CollectionName}/{formatted_number}.png", "wb+")
                 file.write(image.content)
                 file.close()
                 print(f"  Image -> [\u2713] (Successfully downloaded)")
@@ -172,7 +172,7 @@ Finished downloading collection.
 Statistics
 -=-=-=-=-=-
 
-Total of {8888} units in collection "{gooniezgangofficial}".
+Total of {count} units in collection "{CollectionName}".
 
 Downloads:
 
@@ -186,7 +186,7 @@ Downloads:
     {stats["FailedImages"]} failed
 
 
-You can find the images in the images/{gooniezgangofficial} folder.
-The JSON for each NFT can be found in the images/{gooniezgangofficial}/image_data folder.
+You can find the images in the images/{CollectionName} folder.
+The JSON for each NFT can be found in the images/{CollectionName}/image_data folder.
 Press enter to exit...""")
 input()
